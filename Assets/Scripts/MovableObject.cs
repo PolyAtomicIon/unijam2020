@@ -2,51 +2,57 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MovableObject : MonoBehaviour
+public class MovableObject : MonoBehaviour, MovableInterface
 {
 
+    private InteractableObject interaction_script;
     Rigidbody2D rb;
+    
+    GameObject target;
+        float moveSpeed;
 
-    private boolean pushable;
+    public void set_movement_data(float b){
+        moveSpeed = b;
+    }
 
-    void Freeze_position(){
+    public void Freeze_position(){
         rb.constraints = RigidbodyConstraints2D.FreezePosition;
     }
 
-    void reFreeze_position(){
+    public void reFreeze_position(){
         rb.constraints = RigidbodyConstraints2D.None;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+    }
+
+    public void reset_pushable(){
+        interaction_script.pushable = true;
+    }
+
+    public void in_range(bool a){
+        interaction_script.isInRange = a;
+    }
+
+    public bool is_pushable(){
+        return interaction_script.pushable;
     }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        pushable = false;
-        
+        interaction_script = GetComponent<InteractableObject>();
+        target = GameObject.FindGameObjectWithTag("Player");
+
         Freeze_position();
     }
 
     void Update()
     {
-        
-    }
-
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        Debug.Log("collision enter " + collision.gameObject.tag );
-        if( collision.gameObject.tag == "Player"){
-            if( !pushable ){
-                reFreeze_position();
-            }   
+        if( !interaction_script.pushable ){
+            Debug.Log(target.name);
+            // transform.Translate(target.transform.position * Time.deltaTime);
+            transform.position = Vector3.Lerp(transform.position, target.transform.position + new Vector3(1.5f, 1.5f, 0), Time.time);
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        Debug.Log("collision exit " + collision.gameObject.tag );
-        if( collision.gameObject.tag == "Player" && !pushable  ){
-            Freeze_position();
-        }
-    }
 
 }
