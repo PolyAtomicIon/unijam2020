@@ -8,10 +8,13 @@ public class MovableObject : MonoBehaviour, MovableInterface
     private InteractableObject interaction_script;
     Rigidbody2D rb;
     
-    GameObject target;
-        float moveSpeed;
+    player target;
+    float moveSpeed;
 
-    public void set_movement_data(float b){
+    private bool pulling = false;
+
+    public void set_movement_data(player a, float b){
+        target = a;
         moveSpeed = b;
     }
 
@@ -40,7 +43,7 @@ public class MovableObject : MonoBehaviour, MovableInterface
     {
         rb = GetComponent<Rigidbody2D>();
         interaction_script = GetComponent<InteractableObject>();
-        target = GameObject.FindGameObjectWithTag("Player");
+       // target = GameObject.FindGameObjectWithTag("Player");
 
         Freeze_position();
     }
@@ -49,9 +52,26 @@ public class MovableObject : MonoBehaviour, MovableInterface
     {
         if( !interaction_script.pushable ){
             Debug.Log(target.name);
+            /*
+            float angle = target.transform.rotation.z;
+
+            Vector3 direction = new Vector3( Mathf.Cos(angle) * 1.3f, Mathf.Sin(angle) * 1.3f, 0f );
+            */
+            //Debug.Log(direction);
+
             // transform.Translate(target.transform.position * Time.deltaTime);
-            transform.position = Vector3.Lerp(transform.position, target.transform.position + new Vector3(1.5f, 1.5f, 0), Time.time);
+            transform.position = target.pull_pos.position;
+        
+            pulling = true;
         }
+
+        if( interaction_script.pushable && pulling ){
+            pulling = false;
+            interaction_script.isInRange = false;
+            Freeze_position();
+            target.interacting = false;
+        }
+
     }
 
 

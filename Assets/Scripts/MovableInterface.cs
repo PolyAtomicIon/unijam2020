@@ -5,7 +5,7 @@ using UnityEngine;
 public interface MovableInterface
 {
 
-    void set_movement_data(float b);
+    void set_movement_data(player a, float b);
 
     void Freeze_position();
 
